@@ -1,0 +1,35 @@
+version: '3'
+
+volumes:
+  db-data:
+
+services:
+  maplestory-srv:
+    build: .
+    ports:
+      - "8484:8484" # login server
+      - "7575-7594:7575-7594" # world 1 channels
+      - "7675-7694:7675-7694" # world 2 channels
+      - "7775-7794:7775-7794" # world 3 channels
+      - "7875-7894:7875-7894" # world 4 channels
+      - "7975-7994:7975-7994" # world 5 channels
+      - "5252:5252" # GM server
+    depends_on:
+      - "maplestory-db"
+    environment:
+      - HOST
+      - DB_USER
+      - DB_PASS
+      - DB_URL=maplestory-db
+
+  maplestory-db:
+    image: mariadb:10.4
+    restart: always
+    ports:
+      - "3306:3306" # default port
+    environment:
+      - MYSQL_DATABASE=heavenms
+      - MYSQL_ROOT_PASSWORD
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+      - "db-data:/var/lib/mysql"
